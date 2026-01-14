@@ -9,3 +9,7 @@ frontend/.next/
 # env
 .env
 .env.local
+
+venv/
+node_modules/
+.next/
