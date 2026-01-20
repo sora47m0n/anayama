@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "../components/Header";
 import PriceChart from "../components/PriceChart";
 
 const data = [
@@ -14,11 +15,7 @@ export default function PredictHome(){
   return (
     <div >
       {/* ヘッダー*/}
-      <header>
-        <h1 >株価予測</h1>
-        <button>ログアウト</button>
-      </header>
-
+        <Header/>
       {/* メイン */}
       <main >
         {/*チャート */}
