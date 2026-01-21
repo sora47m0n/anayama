@@ -35,7 +35,7 @@ export default function StockList() {
       {/* --- 3段目: 銘柄リスト --- */}
       <div className="">
         <Link 
-          href={`/result`} //ここでwgに遷移(resultフォルダーは仮名)
+          href={`/predict`} //ここでwgに遷移(resultフォルダーは仮名)
           /* 設計書ID: wf_lnc01 (銘柄リンク) */
           className="wf_lnc01 text-[#6633cc] text-[20px] hover:underline hover:opacity-80"
         >

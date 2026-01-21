@@ -1,7 +1,7 @@
 "use client";
 
-import Header from "../components/Header";
-import PriceChart from "../components/PriceChart";
+import Header from '@/components/Header';
+import PriceChart from "@/components/PriceChart";
 
 const data = [
   { date: "12/1", actual: 900, pred: 880 },
