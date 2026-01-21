@@ -6,7 +6,7 @@ from datetime import datetime, date
 # ---------------------------------------------------------
 # 設定：Supabaseの接続文字列(URI)
 # ---------------------------------------------------------
-DB_URL = "postgresql://postgres.xxxx:your_password@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres"
+DB_URL = "https://ogjpslisorqbztlzhocd.supabase.co/"
 
 # 取得期間設定 (2024/1 ～ 2025/12)
 START_DATE = "2024-01-01"
