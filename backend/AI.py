@@ -7,8 +7,8 @@ from supabase import create_client, Client
 
 # --- 1. Supabase接続設定 ---
 # Supabaseのダッシュボード > Settings > API から取得できる情報を設定してください
-SUPABASE_URL = "https://zwnqbpunabqgnhkiutbj.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bnFicHVuYWJxZ25oa2l1dGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNTQ0NjMsImV4cCI6MjA4MzkzMDQ2M30.c1YKLmb6mRvhENUsgcydInSgizcpMZfiypjQJu-5ocI"
+SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co/"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5Mjk0MzIsImV4cCI6MjA4NDUwNTQzMn0.GrwGtPcwE1O8eE19VrcItPxlZP4p_aYOn9B53AtfsrU"
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
