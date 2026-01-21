@@ -1,10 +1,14 @@
-import Image from "next/image";
+import Header from '@/components/Header';
+import StockList from '@/components/StockList';
 
 export default function Home() {
   return (
-    <main style={{ padding: "40px", fontSize: "24px" }}>
-      <h1>こんにちは 👋</h1>
-      <p>anayama フロントエンドが正常に動いています。</p>
+    <main className="min-h-screen bg-white">
+      {/*ヘッダーを表示 */}
+      <Header />
+
+      {/* stockリストエリアを表示 */}
+      <StockList />
     </main>
   );
 }
