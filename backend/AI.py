@@ -9,29 +9,28 @@ SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
 # ★ここに ey から始まる Service Role Key (管理者キー) を貼り付けてください★
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg" 
 
-def predict_gold_final():
-    symbol = "GLD"
-    print(f"🏆 {symbol} (Gold) 12/1の価格予測を開始します...")
+def predict_silver_with_deviation():
+    symbol = "SLV"
+    cutoff_date = "2025-11-28" 
+    
+    print(f" {symbol} (Silver) 予測: 移動平均乖離率を追加して分析します...")
+
 
     try:
         # キーチェック
         if "ここに" in SUPABASE_KEY:
-            print("❌ エラー: SUPABASE_KEY を貼り付けてください！")
+            print(" エラー: SUPABASE_KEY を貼り付けてください！")
             return
 
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         
-        # 1. 既存データを取得
-        print("📥 データベースから既存データを取得中...")
-        response = supabase.table('market_prices') \
-            .select("*") \
-            .eq('symbol', symbol) \
-            .order('trade_date') \
-            .execute()
+        # 1. データ取得
+        print(" データを取得中...")
+        response = supabase.table('market_prices').select("*").eq('symbol', symbol).order('trade_date').execute()
         
         data = response.data
         if not data:
-            print("❌ データが見つかりません。")
+            print("データが見つかりません。")
             return
 
         # 2. データ加工
@@ -40,23 +39,37 @@ def predict_gold_final():
         for c in cols: df[c] = df[c].astype(float)
         df['trade_date'] = pd.to_datetime(df['trade_date'])
 
+        # 日付フィルタリング
+        df = df[df['trade_date'] <= cutoff_date].copy()
         last_date_in_db = df['trade_date'].iloc[-1]
-        print(f"✅ 最終データ日付: {last_date_in_db.strftime('%Y-%m-%d')}")
-
-        # 3. 特徴量作成
+        
+        # 3. 特徴量作成 (★ここに乖離率を追加★)
         df['TargetPrice'] = df['adjusted_close_price']
+        
+        # 移動平均
         df['SMA_5'] = df['TargetPrice'].rolling(5).mean()
         df['SMA_25'] = df['TargetPrice'].rolling(25).mean()
+        
+        # ★追加: 移動平均乖離率 (%)
+        # (現在値 - 移動平均) / 移動平均
+        df['Dev_Rate_5'] = (df['TargetPrice'] - df['SMA_5']) / df['SMA_5']
+        df['Dev_Rate_25'] = (df['TargetPrice'] - df['SMA_25']) / df['SMA_25']
+
+        # 既存の特徴量
         df['Price_Change'] = df['TargetPrice'].pct_change()
         df['Range'] = df['high_price'] - df['low_price']
         
+        # 目的変数
         df['NextDay_Diff'] = df['TargetPrice'].shift(-1) - df['TargetPrice']
         
-        features = ['SMA_5', 'SMA_25', 'Price_Change', 'Range', 'volume']
+        # ★特徴量リストに乖離率を追加
+        features = ['SMA_5', 'SMA_25', 'Dev_Rate_5', 'Dev_Rate_25', 'Price_Change', 'Range', 'volume']
+        
+        # 欠損除去
         train_df = df.dropna(subset=features + ['NextDay_Diff'])
 
         # 4. モデル学習
-        print("🤖 AIモデル学習中...")
+        print(" AIモデル学習中 (乖離率を考慮)...")
         model = lgb.LGBMRegressor(random_state=42, verbosity=-1)
         model.fit(train_df[features], train_df['NextDay_Diff'])
         
@@ -71,35 +84,36 @@ def predict_gold_final():
         target_date = last_date_in_db + timedelta(days=1)
         while target_date.weekday() >= 5: 
             target_date += timedelta(days=1)
-            
         target_date_str = target_date.strftime('%Y-%m-%d')
         
-        print("\n" + "="*45)
-        print(f"🔮 {symbol} 予測結果 (送信データ)")
-        print("="*45)
-        print(f"銘柄コード     : {symbol}")
-        print(f"予測対象日     : {target_date_str}")
-        print(f"AI予測終値     : {predicted_price:.4f}")
-        print("="*45 + "\n")
+        # 乖離率の状況を表示
+        dev5 = latest_row['Dev_Rate_5'].iloc[0] * 100
+        dev25 = latest_row['Dev_Rate_25'].iloc[0] * 100
 
-        # 6. 結果をDB保存 (★ここを修正しました★)
+        print("\n" + "="*50)
+        print(f"🔮 {symbol} 詳細分析結果")
+        print("="*50)
+        print(f"基準日         : {last_date_in_db.strftime('%Y-%m-%d')}")
+        print(f"現在価格       : ${current_price:.2f}")
+        print(f"5日線乖離率    : {dev5:+.2f}%  ({'買われすぎ' if dev5 > 0 else '売られすぎ'})")
+        print(f"25日線乖離率   : {dev25:+.2f}% ({'買われすぎ' if dev25 > 0 else '売られすぎ'})")
+        print("-" * 50)
+        print(f"予測対象日     : {target_date_str}")
+        print(f"AI予測変動     : {pred_diff:+.4f}")
+        print(f"AI予測終値     : ${predicted_price:.4f}")
+        print("="*50 + "\n")
+
+        # 6. 保存
         insert_data = {
             "stock_code": symbol,
             "target_date": target_date_str,
             "predicted_close": round(predicted_price, 4)
         }
-        
-        # insert ではなく upsert を使い、stock_code と target_date が被ったら上書きする設定にします
-        supabase.table('prediction_results').upsert(
-            insert_data, 
-            on_conflict="stock_code, target_date"
-        ).execute()
-        
-        print("💾 予測結果を上書き保存しました！")
-        print("🎉 全ての工程が完了しました。")
+        supabase.table('prediction_results').upsert(insert_data, on_conflict="stock_code, target_date").execute()
+        print(" 分析結果を保存しました！")
 
     except Exception as e:
-        print(f"❌ エラーが発生しました: {e}")
+        print(f" エラー: {e}")
 
 if __name__ == "__main__":
-    predict_gold_final()
+    predict_silver_with_deviation()
