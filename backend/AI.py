@@ -8,7 +8,7 @@ from supabase import create_client, Client
 # --- 1. Supabase接続設定 ---
 # Supabaseのダッシュボード > Settings > API から取得できる情報を設定してください
 SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co/"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5Mjk0MzIsImV4cCI6MjA4NDUwNTQzMn0.GrwGtPcwE1O8eE19VrcItPxlZP4p_aYOn9B53AtfsrU"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg"
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -124,5 +124,5 @@ def predict_stock_price(symbol):
 # 実行例
 if __name__ == "__main__":
     # テスト実行
-    result = predict_stock_price('7203') # トヨタ自動車の例
+    result = predict_stock_price('1542.T') 
     print(result)

@@ -119,7 +119,7 @@ def save_etf_and_prices(symbol):
 if __name__ == "__main__":
     # 対象の銘柄リスト
     # (SPY:S&P500, QQQ:ナスダック, VTI:全米, GLD:金, MSFT:個別株の例)
-    tickers = ["SPY", "QQQ", "VTI", "GLD", "MSFT"]
+    tickers = ["SPY", "QQQ", "VTI", "GLD", "MSFT","1542.T"]
     
     for t in tickers:
         save_etf_and_prices(t)
