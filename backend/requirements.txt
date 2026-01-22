@@ -1,3 +1,10 @@
 fastapi
 uvicorn
 asyncpg
+yfinance
+psycopg2-binary
+lightgbm
+scikit-learn
+pandas
+numpy
+supabase
