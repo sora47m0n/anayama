@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import lightgbm as lgb
 from supabase import create_client, Client
 
-# --- 設定 ---
+# --- 設定 --
 SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
 # ★ここに ey から始まる Service Role Key (管理者キー) を貼り付けてください★
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg" 
