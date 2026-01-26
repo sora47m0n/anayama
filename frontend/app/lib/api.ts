@@ -8,9 +8,9 @@ export type Row = {
 };
 
 // promiseを入れるとすぐに返すのではなく通信終了後にかえす
-export async function fetchPredictSeries(): Promise<Row[]> {
+export async function fetchPredictSeries(code:String): Promise<Row[]> {
     const res = await fetch(
-        `${API_BASE}/api/predict-series`,
+        `${API_BASE}/api/predict-series?symbol=${code}`,
         { cache: "no-store"}
     );
 

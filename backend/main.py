@@ -16,10 +16,15 @@ app.add_middleware(
 )
 
 # # --- 設定 --
-# SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
+SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
 # # ★ここに ey から始まる Service Role Key (管理者キー) を貼り付けてください★
-# SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg" 
-# supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg" 
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+#日付を変換する関数
+def mmdd(date_str: str) -> str:
+    d = datetime.fromisoformat(date_str[:10])
+    return f"{d.month}/{d.day}"
 
 
 # 返すデータの型
@@ -33,32 +38,20 @@ class Row(BaseModel):
 async def root():
     return {"message": "Hello FastAPI"}
 
+#DBから実値、予測値をフロントに返す
+#(response_modelはreturnで返す型を表す)
 @app.get("/api/predict-series", response_model=List[Row])
-async def predict_output():
+def get_predict_series(symbol="", start="2024-11-01")
 
-    return [
-        { "date": "12/1", "actual": 900,  "pred": 880 },
-        { "date": "12/2", "actual": 820,  "pred": 840 },
-        { "date": "12/3", "actual": 950,  "pred": 910 },
-        { "date": "12/4", "actual": 1000, "pred": 930 },
-        { "date": "12/5", "actual": None, "pred": 930 },
-        { "date": "12/6", "actual": None, "pred": 1000 }
-    ]
+# @app.get("/api/predict-series", response_model=List[Row])
+# async def predict_output():
 
-# @app.get("/api/predict-series", resuponse_model=List[Row])
-# async def get_predict_series():
-# """
-#     返す形：[{date, actual, pred}, ...]
-#     - 11月：actualだけ
-#     - 12/1：predだけ
-#     みたいな穴あきでも返せるように FULL OUTER JOIN を使う例
-# """
-#     assert pool is not None
-
-#     sql = """
-#     SELECT
-#         to_char(coalesce(t.trade_date,p.target_date), 'MM/DD') as date,
-#         t.close_price as actual,
-#         p.predicted_close as pred
-#     FROM market_prices t
+#     return [
+#         { "date": "12/1", "actual": 900,  "pred": 880 },
+#         { "date": "12/2", "actual": 820,  "pred": 840 },
+#         { "date": "12/3", "actual": 950,  "pred": 910 },
+#         { "date": "12/4", "actual": 1000, "pred": 930 },
+#         { "date": "12/5", "actual": None, "pred": 930 },
+#         { "date": "12/6", "actual": None, "pred": 1000 }
+#     ]
 

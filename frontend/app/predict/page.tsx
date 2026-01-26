@@ -15,7 +15,7 @@ export default function PredictHome(){
 
   // マウント時のみ一度だけ実行される
   useEffect(() => {
-    fetchPredictSeries()
+    fetchPredictSeries(code)
       .then(setData)
       .catch((e) =>{
         console.error(e);
