@@ -1,19 +1,28 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from "react";
 import Header from '@/components/Header';
 import PriceChart from "@/components/PriceChart";
-
-const data = [
-  { date: "12/1", actual: 900, pred: 880 },
-  { date: "12/2", actual: 820, pred: 840 },
-  { date: "12/3", actual: 950, pred: 910 },
-  { date: "12/4", actual: 1000, pred: 930 },
-  { date: "12/5", pred: 930 },
-]
+import { fetchPredictSeries, type Row } from "@/app/lib/api";
 
 export default function PredictHome(){
   const searchParams = useSearchParams();
   const code = searchParams.get('code'); // これで "1542.T" をとる
+
+  // 値が変わったときにリロードしてくれる部分
+  const [data, setData] = useState<Row[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // マウント時のみ一度だけ実行される
+  useEffect(() => {
+    fetchPredictSeries()
+      .then(setData)
+      .catch((e) =>{
+        console.error(e);
+        setData([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
   return (
     <div >
       {/* ヘッダー*/}

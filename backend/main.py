@@ -2,15 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
-# from supabase_client import get
-import db,os
-import asyncpg
-import ssl
-
-
-# DB住所定義
-# DATABASE_URL = os.environ["DATABASE_URL"]
-DATABASE_URL = "postgresql://postgres.ogjpslisorqbztlzhocd:fbifaufiuaef@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres"
 
 # 受付窓口
 app = FastAPI()
@@ -24,41 +15,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# # --- 設定 --
+# SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
+# # ★ここに ey から始まる Service Role Key (管理者キー) を貼り付けてください★
+# SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg" 
+# supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
 # 返すデータの型
 class Row(BaseModel):
     date: str
     actual: Optional[float] = None
     pred: Optional[float] = None
 
-# プールの作成（接続を使いまわしできるイメージ）
-pool: asyncpg.Pool | None = None
-
 # 初期表示
 @app.get("/")
 async def root():
     return {"message": "Hello FastAPI"}
-
-# 起動時のプール作成
-@app.on_event("startup")
-async def startup():
-    global pool
-    #暗号化ルールの設定
-    ssl_ctx = ssl.create_default_context()
-    #プールの作成
-    # pool = await asyncpg.create_pool(DATABASE_URL, ssl=ssl_ctx, min_size=1, max_size=5)
-
-@app.on_event("shutdown")
-async def shutdown():
-    await pool.close()
-
-@app.get("/health")
-async def health_db():
-    if pool is None:
-        raise HTTPException(status_code=500,detail="DB pool is not initialized")
-    
-    async with pool.acquire() as conn:
-        v = await conn.fetchval("select 1;")
-    return {"db": v}
 
 @app.get("/api/predict-series", response_model=List[Row])
 async def predict_output():
