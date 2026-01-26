@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
+from supabase import create_client, Client
+from datetime import datetime
+
 
 # 受付窓口
 app = FastAPI()
@@ -41,7 +44,68 @@ async def root():
 #DBから実値、予測値をフロントに返す
 #(response_modelはreturnで返す型を表す)
 @app.get("/api/predict-series", response_model=List[Row])
-def get_predict_series(symbol="", start="2024-11-01")
+def get_predict_series(
+    symbol="", 
+    actual_start="2025-11-20",
+    actual_end="2025-11-28",
+    pred_start="2025-12-01",
+    pred_end="2025-12-01"
+):
+    # market_pricesから実測を取得
+    actual_res = (
+        supabase.table("market_prices")
+        .select("trade_date, close_price")
+        .eq("symbol", symbol)
+        .gte("trade_date", actual_start)
+        .lte("trade_date", actual_end)
+        .order("trade_date")
+        .execute()
+    )
+
+    if getattr(actual_res, "error", None):
+        return [{"date": "", "actual": None, "pred": None}]
+
+    # prediction_resultsから予測＋実測を取得
+    pred_res = (
+        supabase.table("prediction_results")
+        .select("target_date, predicted_close, actual_close")
+        .eq("stock_code", symbol)
+        .gte("target_date", pred_start)
+        .lte("target_date", pred_end)
+        .order("target_date")
+        .execute()
+    )
+
+    if getattr(pred_res, "error", None):
+        return [{"date": "", "actual": None, "pred": None}]
+
+    # 返す箱
+    merged: Dict[str,dict] = {}
+
+    # 実測を入れる
+    for i in (actual_res.data or []):
+        d_iso = i["trade_date"][:10] #yyyy-mm-dd
+        # 同じ日付があったら作成
+        merged.setdefault(d_iso,{"date":mmdd(d_iso),"actual":None,"pred":None})
+
+        close_price = i.get("close_price")
+
+        merged[d_iso]["actual"] = float(close_price) if close_price is not None else None
+
+    # 予測を入れる
+    for i in (pred_res.data or []):
+        d_iso = i["target_date"][:10]
+        merged.setdefault(d_iso,{"date":mmdd(d_iso), "actual":None, "pred":None})
+        
+        predicted = i.get("predicted_close")
+        merged[d_iso]["pred"] = float(predicted) if predicted is not None else None
+
+        actual_close = i.get("actual_close")
+        merged[d_iso]["actual"] = float(actual_close) if actual_close is not None else None
+    
+    result = [merged[d] for d in sorted(merged.keys())]
+    return result
+
 
 # @app.get("/api/predict-series", response_model=List[Row])
 # async def predict_output():
