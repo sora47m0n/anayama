@@ -16,7 +16,7 @@ export default function StockList() {
 
         {/* 設計書ID: wf_bt01 (ソート) */}
         <select className="wf_bt01 bg-gray-100 border-none rounded px-2 py-1 text-[14px] text-black focus:outline-none cursor-pointer">
-            <option>ソート ⌄</option>
+            <option>ソート</option>
             <option>昇順</option>
             <option>降順</option>
         </select>
