@@ -1,10 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, List
+# from supabase_client import get
 import db,os
 import asyncpg
+import ssl
+
 
 # DB住所定義
-DATABASE_URL = os.environ["DATABASE_URL"]
+# DATABASE_URL = os.environ["DATABASE_URL"]
+DATABASE_URL = "postgresql://postgres.ogjpslisorqbztlzhocd:fbifaufiuaef@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres"
 
 # 受付窓口
 app = FastAPI()
@@ -12,12 +18,15 @@ app = FastAPI()
 #フロントからのアクセスを許可
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"]
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # 返すデータの型
 class Row(BaseModel):
-    date: star
+    date: str
     actual: Optional[float] = None
     pred: Optional[float] = None
 
@@ -29,13 +38,14 @@ pool: asyncpg.Pool | None = None
 async def root():
     return {"message": "Hello FastAPI"}
 
+# 起動時のプール作成
 @app.on_event("startup")
 async def startup():
     global pool
     #暗号化ルールの設定
     ssl_ctx = ssl.create_default_context()
     #プールの作成
-    pool = await asyncpg.create_pool(DATABASE_URL, ssl=ssl_ctx)
+    # pool = await asyncpg.create_pool(DATABASE_URL, ssl=ssl_ctx, min_size=1, max_size=5)
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -43,35 +53,39 @@ async def shutdown():
 
 @app.get("/health")
 async def health_db():
-    return {"db": result}
+    if pool is None:
+        raise HTTPException(status_code=500,detail="DB pool is not initialized")
+    
+    async with pool.acquire() as conn:
+        v = await conn.fetchval("select 1;")
+    return {"db": v}
 
-@app.get("/predict")
+@app.get("/api/predict-series", response_model=List[Row])
 async def predict_output():
-    return "aaaa"
+
+    return [
+        { "date": "12/1", "actual": 900,  "pred": 880 },
+        { "date": "12/2", "actual": 820,  "pred": 840 },
+        { "date": "12/3", "actual": 950,  "pred": 910 },
+        { "date": "12/4", "actual": 1000, "pred": 930 },
+        { "date": "12/5", "actual": None, "pred": 930 },
+        { "date": "12/6", "actual": None, "pred": 1000 }
+    ]
 
 # @app.get("/api/predict-series", resuponse_model=List[Row])
-# async def get_predict_series(symbol: str = "SPY"):
+# async def get_predict_series():
 # """
 #     返す形：[{date, actual, pred}, ...]
 #     - 11月：actualだけ
 #     - 12/1：predだけ
 #     みたいな穴あきでも返せるように FULL OUTER JOIN を使う例
-#     """
+# """
 #     assert pool is not None
 
-#     # ✅ あなたの実テーブル名/カラム名に合わせて変更してOK
 #     sql = """
 #     SELECT
-#       to_char(coalesce(t.date, p.date), 'MM/DD') AS date,
-#       t.actual AS actual,
-#       p.pred AS pred
-#     FROM training_data t
-#     FULL OUTER JOIN predictions p
-#       ON t.symbol = p.symbol
-#      AND t.date   = p.date
-#     WHERE coalesce(t.symbol, p.symbol) = $1
-#     ORDER BY coalesce(t.date, p.date);
-#     """
+#         to_char(coalesce(t.trade_date,p.target_date), 'MM/DD') as date,
+#         t.close_price as actual,
+#         p.predicted_close as pred
+#     FROM market_prices t
 
-#     rows = await pool.fetch(sql, symbol)
-#     return [dict(r) for r in rows]

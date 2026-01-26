@@ -1,5 +1,5 @@
 "use client";
-
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import PriceChart from "@/components/PriceChart";
 
@@ -12,12 +12,18 @@ const data = [
 ]
 
 export default function PredictHome(){
+  const searchParams = useSearchParams();
+  const code = searchParams.get('code'); // これで "1542.T" をとる
   return (
     <div >
       {/* ヘッダー*/}
         <Header/>
       {/* メイン */}
       <main >
+        {/*銘柄コード確認用*/}
+        <div className="text-center mt-4">
+            <h1 className="text-2xl font-bold">銘柄コード: {code}</h1>
+        </div>
         {/*チャート */}
         <section >
           <PriceChart data={data}/>

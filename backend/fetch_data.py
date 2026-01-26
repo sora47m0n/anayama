@@ -6,7 +6,7 @@ from datetime import datetime, date
 # ---------------------------------------------------------
 # 設定：Supabaseの接続文字列(URI)
 # ---------------------------------------------------------
-DB_URL = "https://ogjpslisorqbztlzhocd.supabase.co/"
+DB_URL = "postgresql://postgres.ogjpslisorqbztlzhocd:fbifaufiuaef@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres"
 
 # 取得期間設定 (2024/1 ～ 2025/12)
 START_DATE = "2024-01-01"
@@ -119,7 +119,7 @@ def save_etf_and_prices(symbol):
 if __name__ == "__main__":
     # 対象の銘柄リスト
     # (SPY:S&P500, QQQ:ナスダック, VTI:全米, GLD:金, MSFT:個別株の例)
-    tickers = ["SPY", "QQQ", "VTI", "GLD", "MSFT"]
+    tickers = ["SPY", "QQQ", "VTI", "GLD", "MSFT","1542.T"]
     
     for t in tickers:
         save_etf_and_prices(t)

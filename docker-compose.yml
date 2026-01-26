@@ -5,11 +5,11 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     environment:
-      # ローカルのdbの設定
-      # DATABASE_URL: postgres://appuser:apppassword@db:5432/appdb
-      # DB接続先住所
-      - DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.ogjpslisorqbztlzhocd.supabase.co:5432/postgres
+      DATABASE_URL: postgres://appuser:apppassword@db:5432/appdb
     depends_on:
       - db
 
@@ -23,19 +23,17 @@ services:
     depends_on:
       - backend
 
-
-  # 今回はsupabaseを使用するので一度削除しました
-  # db:
-  #   image: postgres:15
-  #   container_name: anayama-db
-  #   environment:
-  #     POSTGRES_USER: appuser
-  #     POSTGRES_PASSWORD: apppassword
-  #     POSTGRES_DB: appdb
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
+  db:
+    image: postgres:15
+    container_name: anayama-db
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:

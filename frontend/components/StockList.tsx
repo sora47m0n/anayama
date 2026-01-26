@@ -16,7 +16,7 @@ export default function StockList() {
 
         {/* 設計書ID: wf_bt01 (ソート) */}
         <select className="wf_bt01 bg-gray-100 border-none rounded px-2 py-1 text-[14px] text-black focus:outline-none cursor-pointer">
-            <option>ソート ⌄</option>
+            <option>ソート</option>
             <option>昇順</option>
             <option>降順</option>
         </select>
@@ -35,7 +35,7 @@ export default function StockList() {
       {/* --- 3段目: 銘柄リスト --- */}
       <div className="">
         <Link 
-          href={`/predict`} //ここでwgに遷移(resultフォルダーは仮名)
+          href={`/predict?code=${stock.id}`} //ここでwgに遷移(resultフォルダーは仮名)
           /* 設計書ID: wf_lnc01 (銘柄リンク) */
           className="wf_lnc01 text-[#6633cc] text-[20px] hover:underline hover:opacity-80"
         >
