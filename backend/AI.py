@@ -10,7 +10,7 @@ SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9nanBzbGlzb3JxYnp0bHpob2NkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODkyOTQzMiwiZXhwIjoyMDg0NTA1NDMyfQ.pfZdwXZfjYMQcmlYQHahp-x6TP5v37V157X859hzneg" 
 
 def predict_silver_with_deviation():
-    symbol = "SLV"
+    symbol = "1542.T"
     cutoff_date = "2025-11-28" 
     
     print(f" {symbol} (Silver) 予測: 移動平均乖離率を追加して分析します...")
@@ -73,7 +73,7 @@ def predict_silver_with_deviation():
         model = lgb.LGBMRegressor(random_state=42, verbosity=-1)
         model.fit(train_df[features], train_df['NextDay_Diff'])
         
-        # 5. 予測実行
+        # 5. 予測実行11
         latest_row = df.iloc[[-1]].copy()
         pred_diff = model.predict(latest_row[features].fillna(0))[0]
         
