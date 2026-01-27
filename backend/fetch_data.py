@@ -11,7 +11,7 @@ DB_URL = "postgresql://postgres.ogjpslisorqbztlzhocd:fbifaufiuaef@aws-1-ap-south
 # 取得期間設定 (2024/1 ～ 2025/12)
 START_DATE = "2024-01-01"
 
-END_DATE = "2025-11-30" 
+END_DATE = "2025-12-31" 
 
 def save_etf_and_prices(symbol):
     conn = None

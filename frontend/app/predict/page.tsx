@@ -44,9 +44,9 @@ export default function PredictHome(){
       {/* メイン */}
       <main >
         {/*銘柄コード確認用*/}
-        {/* <div className="text-center mt-4">
+        <div className="text-center mt-4">
             <h1 className="text-2xl font-bold">銘柄コード: {code}</h1>
-        </div> */}
+        </div>
         {/*チャート */}
         <section >
           <PriceChart data={data}/>

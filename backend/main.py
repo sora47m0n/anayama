@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GEMINI_API_KEY = "AIzaSyAGMFdF6umLuW1XVNrqjQjUgAi8kUMNlFQ"
+GEMINI_API_KEY = "AIzaSyAPoP8_ZDxPCN5ptZJNWEANytFWUTKjCHw"
 gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # # --- 設定 --
@@ -55,7 +55,7 @@ def generate_comment(symbol=""):
     if not series:
         return {"comment":"データがないのでコメントを生成できませんでした。"}
     
-    tail = series[-10:]
+    tail = series[-30:]
 
     prompt = f"""
     あなたは株価チャートの“見どころ”を短く説明するアシスタントです。投資助言（買え/売れ）はしません。
@@ -63,6 +63,8 @@ def generate_comment(symbol=""):
     - actual と pred の違いがある場合は軽く触れる
     - 直近の動き（上昇/下降/横ばい）を一言で
     - 注意点（決算・ニュース・出来高・急変動リスク等）を1つ入れる
+    - どちらかというと売りか買いかを説明して出して最後に
+
 
     銘柄: {symbol}
     データ: {tail}
@@ -94,9 +96,9 @@ def generate_comment(symbol=""):
 def get_predict_series(
     symbol="", 
     actual_start="2025-11-20",
-    actual_end="2025-11-28",
+    actual_end="2025-12-02",
     pred_start="2025-12-01",
-    pred_end="2025-12-01"
+    pred_end="2025-12-03"
 ):
     # market_pricesから実測を取得
     actual_res = (
@@ -147,8 +149,8 @@ def get_predict_series(
         predicted = i.get("predicted_close")
         merged[d_iso]["pred"] = float(predicted) if predicted is not None else None
 
-        actual_close = i.get("actual_close")
-        merged[d_iso]["actual"] = float(actual_close) if actual_close is not None else None
+        # actual_close = i.get("actual_close")
+        # merged[d_iso]["actual"] = float(actual_close) if actual_close is not None else None
     
     result = [merged[d] for d in sorted(merged.keys())]
     return result
