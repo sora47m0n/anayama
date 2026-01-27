@@ -24,7 +24,7 @@ export default function PriceChart({ data }: { data: Row[]}){
         <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 10}}>
           <CartesianGrid strokeDasharray="3 3"/>
           <XAxis dataKey="date"/>
-          <YAxis/>
+          <YAxis domain={[22000, 27000]}/>
           <Tooltip/>
           <Legend/>
 

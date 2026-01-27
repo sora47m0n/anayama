@@ -7,10 +7,21 @@ export type Row = {
     pred: number | null;
 };
 
-// promiseを入れるとすぐに返すのではなく通信終了後にかえす
-export async function fetchPredictSeries(): Promise<Row[]> {
+export async function fetchAiComment(code: string): Promise<{comment: string}>{
     const res = await fetch(
-        `${API_BASE}/api/predict-series`,
+        `${API_BASE}/api/comment?symbol=${code}`,
+        { cache: "no-cache"}
+    );
+
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+    return res.json(); 
+}
+
+// promiseを入れるとすぐに返すのではなく通信終了後にかえす
+export async function fetchPredictSeries(code:String): Promise<Row[]> {
+    const res = await fetch(
+        `${API_BASE}/api/predict-series?symbol=${code}`,
         { cache: "no-store"}
     );
 
