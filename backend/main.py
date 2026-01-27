@@ -4,6 +4,11 @@ from pydantic import BaseModel
 from typing import Optional, List
 from supabase import create_client, Client
 from datetime import datetime
+from google import genai
+from google.genai import types
+from fastapi import HTTPException
+from typing import Dict
+
 
 
 # 受付窓口
@@ -17,6 +22,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+GEMINI_API_KEY = "AIzaSyAGMFdF6umLuW1XVNrqjQjUgAi8kUMNlFQ"
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # # --- 設定 --
 SUPABASE_URL = "https://ogjpslisorqbztlzhocd.supabase.co"
@@ -40,6 +48,45 @@ class Row(BaseModel):
 @app.get("/")
 async def root():
     return {"message": "Hello FastAPI"}
+
+@app.get("/api/comment")
+def generate_comment(symbol=""):
+    series = get_predict_series(symbol=symbol)
+    if not series:
+        return {"comment":"データがないのでコメントを生成できませんでした。"}
+    
+    tail = series[-10:]
+
+    prompt = f"""
+    あなたは株価チャートの“見どころ”を短く説明するアシスタントです。投資助言（買え/売れ）はしません。
+    次のデータ（date, actual, pred）を見て、初心者にも分かる日本語で「今後注目するポイント」を3〜5行で書いてください。
+    - actual と pred の違いがある場合は軽く触れる
+    - 直近の動き（上昇/下降/横ばい）を一言で
+    - 注意点（決算・ニュース・出来高・急変動リスク等）を1つ入れる
+
+    銘柄: {symbol}
+    データ: {tail}
+    """.strip()
+
+    # 生成
+    resp = gemini_client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0.3,
+            max_output_tokens=6000
+        ),
+    )
+    
+    print(resp.usage_metadata)
+
+    text = (resp.text or "").strip()
+    if not text:
+        raise HTTPException(status_code=500, detail="Geminiの返答が空でした")
+    
+    return {"comment": text}
+    
+
 
 #DBから実値、予測値をフロントに返す
 #(response_modelはreturnで返す型を表す)
